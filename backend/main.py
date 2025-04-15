@@ -86,7 +86,7 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     return new_task
 
 
-@app.get("/task/{user_id}", response_model=List[TaskSchema])
+@app.get("/TaskToMe/{user_id}", response_model=List[TaskSchema])
 def get_tasks_by_executing_user(user_id: int, db: Session = Depends(get_db)):
     tasks = db.query(Task).filter(Task.executing == user_id).all()
 
@@ -94,3 +94,18 @@ def get_tasks_by_executing_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Задачи для пользователя не найдены")
 
     return tasks
+
+@app.get("/TaskFromMe/{user_id}", response_model=List[TaskSchema])
+def get_tasks_by_executing_user(user_id: int, db: Session = Depends(get_db)):
+    tasks = db.query(Task).filter(Task.sender == user_id).all()
+
+    if not tasks:
+        raise HTTPException(status_code=404, detail="Задачи для пользователя не найдены")
+
+    return tasks
+
+@app.get("/task-counts/{user_id}")
+async def get_task_counts(user_id: int, db: Session = Depends(get_db)):
+    to_me_count = db.query(Task).filter(Task.executing == user_id).count()
+    from_me_count = db.query(Task).filter(Task.sender == user_id).count()
+    return {"to_me": to_me_count, "from_me": from_me_count}

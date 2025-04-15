@@ -15,7 +15,11 @@ function TaskModal({ task, onClose }) {
 			>
 				<div className='flex justify-end'>
 					<button onClick={onClose} className='text-gray-500 text-xl'>
-						×
+						<img
+							src='assets/icons/plus.svg'
+							alt=''
+							className=' h-7 w-7 rotate-45 active:scale-97 transition-all '
+						/>
 					</button>
 				</div>
 

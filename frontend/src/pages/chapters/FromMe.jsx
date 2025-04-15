@@ -109,7 +109,7 @@ function FromMe() {
 					</motion.div>
 				))
 			) : (
-				<p className='text-center text-gray-500'>Задач нет</p>
+				<p className='text-center text-gray-500'>Задач нет 💤</p>
 			)}
 
 			{selectedTask && (

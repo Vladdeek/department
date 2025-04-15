@@ -70,6 +70,11 @@ async def check_user(userId: str, db: Session = Depends(get_db)):
         return {"exists": True}
     raise HTTPException(status_code=404, detail="Пользователь не найден")
 
+@app.get("/users", response_model=List[UserSchema])
+def get_users(db: Session = Depends(get_db)):
+    users = db.query(User).all()  # Получаем всех пользователей
+    return users
+
 
 @app.post("/task", response_model=TaskSchema)
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):

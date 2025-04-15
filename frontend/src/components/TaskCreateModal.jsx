@@ -5,6 +5,7 @@ import { darkTheme, lightTheme } from '../constants'
 const TaskCreateModal = ({ onClose }) => {
 	const [departments, setDepartments] = useState([])
 	const [users, setUsers] = useState([])
+	const [filteredUsers, setFilteredUsers] = useState([]) // Состояние для фильтрации пользователей
 	const [priorities, setPriorities] = useState([])
 	const userId = localStorage.getItem('user_id')
 	const [formData, setFormData] = useState({
@@ -23,6 +24,7 @@ const TaskCreateModal = ({ onClose }) => {
 
 	useEffect(() => {
 		if (open) {
+			// Загружаем все департаменты и приоритеты
 			fetch('http://localhost:8000/departments')
 				.then(res => res.json())
 				.then(data => {
@@ -34,18 +36,25 @@ const TaskCreateModal = ({ onClose }) => {
 				.then(data => {
 					setPriorities(data)
 				})
+
+			// Загружаем всех пользователей
+			fetch('http://localhost:8000/users')
+				.then(res => res.json())
+				.then(data => {
+					console.log(data)
+					setUsers(data)
+				})
 		}
 	}, [])
 
 	useEffect(() => {
 		if (formData.departmentId) {
-			fetch(
-				`http://localhost:8000/users-by-department/${formData.departmentId}`
+			const filtered = users.filter(
+				user => user.department_id === Number(formData.departmentId)
 			)
-				.then(res => res.json())
-				.then(setUsers)
+			setFilteredUsers(filtered)
 		}
-	}, [formData.departmentId])
+	}, [formData.departmentId, users]) // Перезапускаем, когда меняется departmentId или список пользователей
 
 	const handleSubmit = () => {
 		const body = {
@@ -161,7 +170,7 @@ const TaskCreateModal = ({ onClose }) => {
 							<option className='text-black' value=''>
 								Выберите исполнителя
 							</option>
-							{users.map(user => (
+							{filteredUsers.map(user => (
 								<option
 									key={user.id}
 									value={user.user_id}

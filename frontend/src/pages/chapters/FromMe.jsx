@@ -9,6 +9,7 @@ function FromMe() {
 	const [userData, setUserData] = useState(null)
 	const [taskData, setTaskData] = useState([])
 	const [selectedTask, setSelectedTask] = useState(null) // для хранения выбранной задачи
+	const [isLoading, setIsLoading] = useState(true)
 
 	const shortMonths = [
 		'Янв.',
@@ -62,17 +63,23 @@ function FromMe() {
 				}
 			)
 			const data = await response.json()
-			console.log(data)
 			setTaskData(data)
+			setIsLoading(false)
 		}
 
-		checkUserExists(userId)
-		fetchTask(userId)
+		const loadData = async () => {
+			await checkUserExists(userId)
+			await fetchTask(userId)
+		}
+
+		loadData()
 	}, [])
 
 	return (
 		<>
-			{taskData.length > 0 ? (
+			{isLoading ? (
+				<p className='text-center text-gray-500 text-lg mt-4'>Загрузка...</p>
+			) : taskData.length > 0 ? (
 				taskData.map((task, idx) => (
 					<motion.div
 						key={task.id}

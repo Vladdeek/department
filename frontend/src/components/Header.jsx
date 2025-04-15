@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { darkTheme, lightTheme } from '../constants'
 
-function Header({ username, image_path }) {
+function Header({ username, image_path, onCreateTask }) {
 	const navigate = useNavigate()
 	const [greeting, setGreeting] = useState('')
 
@@ -20,16 +20,27 @@ function Header({ username, image_path }) {
 
 	return (
 		<header
-			className='relative w-full h-[33vh] flex justify-between items-center px-5'
+			className=' w-full h-[40vh] flex flex-col items-start px-5'
 			style={{
 				color: lightTheme.text,
 			}}
 		>
-			<img
-				src={image_path}
-				alt=''
-				className='absolute top-4 right-4 h-12 w-12 object-cover rounded-2xl'
-			/>
+			<div className='flex w-full justify-between mt-4'>
+				<button
+					onClick={onCreateTask}
+					className='flex gap-2 items-center bg-[#ffffff50] rounded-2xl shadow-sm active:bg-[#ffffff75] active:scale-98 active:shadow-xs p-2 transition-all'
+				>
+					<img src='assets/icons/plus.svg' alt='' className=' ' />
+					<p className='font-semibold'>Создать задачу</p>
+				</button>
+
+				<img
+					src={image_path}
+					alt=''
+					className=' h-12 w-12 object-cover rounded-2xl'
+				/>
+			</div>
+
 			<div className='flex flex-col gap-3 mt-15'>
 				<h1 className='text-2xl font-bold flex items-center gap-2'>
 					Привет, {username}!{' '}

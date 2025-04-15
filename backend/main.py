@@ -9,8 +9,8 @@ from passlib.context import CryptContext # библиотека для ХЕША 
 
 #импорт наших классов
 from database import engine, session_local
-from models import Base, User, Task
-from schemas import UserCreate, User as UserSchema, TaskCreate, Task as TaskSchema
+from models import Base, Department, Priority, User, Task
+from schemas import UserCreate, User as UserSchema, TaskCreate, Task as TaskSchema, Department as DepartmentSchema, Priority as PrioritySchema
 
 
 app = FastAPI()
@@ -47,6 +47,8 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)) -> UserSc
         user_id=user.user_id,
         user_fullname=user.user_fullname,
         email=user.email,
+        image_path=user.image_path,
+        department_id=user.department_id,
     )
     db.add(db_user)
     db.commit()
@@ -109,3 +111,16 @@ async def get_task_counts(user_id: int, db: Session = Depends(get_db)):
     to_me_count = db.query(Task).filter(Task.executing == user_id).count()
     from_me_count = db.query(Task).filter(Task.sender == user_id).count()
     return {"to_me": to_me_count, "from_me": from_me_count}
+
+@app.get("/departments", response_model=List[DepartmentSchema])
+def get_departments(db: Session = Depends(get_db)):
+    return db.query(Department).all()
+
+@app.get("/users-by-department/{dep_id}", response_model=List[UserSchema])
+def get_users_by_department(dep_id: int, db: Session = Depends(get_db)):
+    users = db.query(User).filter(User.department_id == dep_id).all()
+    return users
+
+@app.get("/priorities", response_model=List[PrioritySchema])
+def get_priorities(db: Session = Depends(get_db)):
+    return db.query(Priority).all()

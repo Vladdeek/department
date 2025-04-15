@@ -5,9 +5,11 @@ import { motion } from 'framer-motion'
 import TwoTabs from '../components/TwoTabs'
 import ToMe from './chapters/ToMe'
 import FromMe from './chapters/FromMe'
+import TaskCreateModal from '../components/TaskCreateModal'
 
 function MainPage() {
 	const userId = localStorage.getItem('user_id')
+	const [isModalOpen, setIsModalOpen] = useState(false)
 
 	const [userData, setUserData] = useState(null)
 	const [activeTab, setActiveTab] = useState('toMe')
@@ -16,17 +18,24 @@ function MainPage() {
 	const [fromMeCount, setFromMeCount] = useState(0)
 
 	useEffect(() => {
-		const checkUserExists = async userId => {
-			const response = await fetch(
-				`${import.meta.env.VITE_API_URL}/user/${userId}`,
-				{
-					method: 'GET',
-					headers: { 'Content-Type': 'application/json' },
+		const fetchUser = async () => {
+			try {
+				const response = await fetch(
+					`http://192.168.167.48:8000/user/${userId}`
+				)
+				if (!response.ok) {
+					console.error('Пользователь не найден')
+					return
 				}
-			)
-			const data = await response.json()
-			console.log(data)
-			setUserData(data)
+				const data = await response.json()
+				setUserData(data)
+			} catch (error) {
+				console.error('Ошибка при загрузке пользователя:', error)
+			}
+		}
+
+		if (userId) {
+			fetchUser()
 		}
 		const fetchTaskCounts = async () => {
 			const res = await fetch(
@@ -38,7 +47,6 @@ function MainPage() {
 		}
 
 		fetchTaskCounts()
-		checkUserExists(userId)
 	}, [])
 
 	return (
@@ -48,6 +56,7 @@ function MainPage() {
 				image_path={
 					userData ? userData.image_path : 'https://placehold.co/50x50.png'
 				}
+				onCreateTask={() => setIsModalOpen(true)}
 			/>
 			<TwoTabs
 				activeTab={activeTab}
@@ -56,11 +65,11 @@ function MainPage() {
 				fromMeTasksCount={fromMeCount}
 			/>
 
-			{/* Скролл только здесь 👇 */}
 			<div className='flex-1 overflow-y-auto px-4'>
 				{activeTab === 'toMe' && <ToMe />}
 				{activeTab === 'fromMe' && <FromMe />}
 			</div>
+			{isModalOpen && <TaskCreateModal onClose={() => setIsModalOpen(false)} />}
 		</div>
 	)
 }

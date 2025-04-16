@@ -1,4 +1,5 @@
-from sqlalchemy import Column, DateTime, Integer, String, ForeignKey
+from datetime import datetime
+from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, func
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -64,7 +65,7 @@ class Task(Base):
     priority_id = Column(Integer, ForeignKey('Priority.id'), nullable=False)
     executing = Column(Integer, ForeignKey('User.user_id'), nullable=False)
     sender = Column(Integer, ForeignKey('User.user_id'), nullable=False)
-    date = Column(DateTime, index=True)
+    date = Column(DateTime, index=True, default=datetime.utcnow)
     status_id = Column(Integer, ForeignKey('Status.id'), nullable=False)
     
     status = relationship("Status", back_populates="tasks")

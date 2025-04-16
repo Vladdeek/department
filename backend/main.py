@@ -1,5 +1,9 @@
 import random
 import ast
+from anyio import current_time
+from pytz import timezone
+
+import pytz
 import requests
 from datetime import date, datetime, timedelta
 from fastapi import FastAPI, HTTPException, Path, Query, Body, Depends, Request
@@ -41,6 +45,12 @@ def get_db():
         yield db 
     finally:
         db.close()
+
+def convert_utc_to_msk(utc_dt):
+    msk_tz = pytz.timezone('Europe/Moscow')
+    utc_dt = utc_dt.replace(tzinfo=pytz.utc)  # Указываем, что это UTC
+    msk_dt = utc_dt.astimezone(msk_tz)  # Преобразуем в Московское время
+    return msk_dt
 
 @app.post("/reg_user/", response_model=UserSchema)  
 async def create_user(user: UserCreate, db: Session = Depends(get_db)) -> UserSchema:
@@ -99,8 +109,12 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
 def get_tasks_by_executing_user(user_id: int, db: Session = Depends(get_db)):
     tasks = db.query(Task).filter(Task.executing == user_id).all()
 
+
     if not tasks:
         raise HTTPException(status_code=404, detail="Задачи для пользователя не найдены")
+    
+    for task in tasks:
+        task.date = convert_utc_to_msk(task.date) 
 
     return tasks
 
@@ -108,9 +122,12 @@ def get_tasks_by_executing_user(user_id: int, db: Session = Depends(get_db)):
 def get_tasks_by_executing_user(user_id: int, db: Session = Depends(get_db)):
     tasks = db.query(Task).filter(Task.sender == user_id).all()
 
-    if not tasks:
-        raise HTTPException(status_code=404, detail="Задачи для пользователя не найдены")
 
+    if not tasks:
+        raise HTTPException(status_code=404, detail="Задачи для пользователя не найдены")\
+        
+    for task in tasks:
+        task.date = convert_utc_to_msk(task.date) 
     return tasks
 
 @app.get("/task-counts/{user_id}")

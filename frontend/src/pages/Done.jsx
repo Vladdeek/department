@@ -59,10 +59,16 @@ function Done() {
 				{ method: 'GET', headers: { 'Content-Type': 'application/json' } }
 			)
 			const data = await response.json()
-			const activeTasks = data.filter(
-				task => task.status_id === 2 || task.status_id === 3
-			)
-			setTaskData(activeTasks)
+
+			if (Array.isArray(data)) {
+				const activeTasks = data.filter(
+					task => task.status_id === 2 || task.status_id === 3
+				)
+				setTaskData(activeTasks)
+			} else {
+				console.error('Expected an array, but got:', data)
+			}
+
 			setIsLoading(false)
 		}
 

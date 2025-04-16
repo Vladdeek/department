@@ -62,11 +62,24 @@ function FromMe() {
 					headers: { 'Content-Type': 'application/json' },
 				}
 			)
+
+			if (!response.ok) {
+				console.error('Error fetching tasks:', response.statusText)
+				setIsLoading(false)
+				return
+			}
+
 			const data = await response.json()
-			const filteredTasks = data.filter(
-				task => task.status_id === 1 || task.status_id === 2
-			)
-			setTaskData(filteredTasks)
+
+			if (Array.isArray(data)) {
+				const filteredTasks = data.filter(
+					task => task.status_id === 1 || task.status_id === 2
+				)
+				setTaskData(filteredTasks)
+			} else {
+				console.error('Expected an array, but got:', data)
+			}
+
 			setIsLoading(false)
 		}
 

@@ -56,9 +56,21 @@ function ToMe() {
 				`${import.meta.env.VITE_API_URL}/TaskToMe/${userId}`,
 				{ method: 'GET', headers: { 'Content-Type': 'application/json' } }
 			)
+			if (!response.ok) {
+				console.error('Error fetching tasks:', response.statusText)
+				setIsLoading(false)
+				return
+			}
+
 			const data = await response.json()
-			const activeTasks = data.filter(task => task.status_id === 1) // вот тут фильтрация
-			setTaskData(activeTasks)
+
+			if (Array.isArray(data)) {
+				const activeTasks = data.filter(task => task.status_id === 1)
+				setTaskData(activeTasks)
+			} else {
+				console.error('Expected an array, but got:', data)
+			}
+
 			setIsLoading(false)
 		}
 

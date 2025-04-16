@@ -11,16 +11,29 @@ function TaskModal({ task, from, onClose }) {
 		fetch('http://localhost:8000/departments')
 			.then(res => res.json())
 			.then(data => {
-				console.log(data)
 				setDepartments(data)
 			})
 		fetch('http://localhost:8000/cabinets')
 			.then(res => res.json())
 			.then(data => {
-				console.log(data)
 				setCabinets(data)
 			})
 	}, [])
+
+	const updateTaskStatus = async (taskId, newStatusId) => {
+		const response = await fetch(
+			`${import.meta.env.VITE_API_URL}/task/${taskId}/status`,
+			{
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ status_id: newStatusId }),
+			}
+		)
+		onClose(false)
+		location.reload()
+	}
 
 	const departmentName = departments.find(
 		dep => dep.id === task.sender_user?.department_id
@@ -83,6 +96,13 @@ function TaskModal({ task, from, onClose }) {
 				</p>
 
 				<button
+					onClick={() => {
+						if (from === 'ToMe') {
+							updateTaskStatus(task.id, 2)
+						} else if (from === 'FromMe') {
+							updateTaskStatus(task.id, 3)
+						}
+					}}
 					className={`${
 						from === 'Done' ? 'hidden' : ''
 					} bg-black font-semibold text-white border-2 border-black rounded-2xl w-full py-3 mt-7 active:bg-white active:text-black transition-all `}

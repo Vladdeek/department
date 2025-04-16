@@ -11,7 +11,7 @@ function DoneTaskCard({ priority, title, date, time, img_path, onClick }) {
 	}
 	return (
 		<div
-			className={`w-full flex flex-col justify-between h-40 rounded-4xl bg-white py-3 px-3 shadow-xl active:shadow-lg active:scale-99 transition-all`}
+			className={`w-full h-34 flex flex-col justify-between rounded-4xl bg-white py-3 px-3 shadow-xl active:shadow-lg active:scale-99 transition-all`}
 			style={{
 				color: lightTheme.text,
 			}}
@@ -23,6 +23,14 @@ function DoneTaskCard({ priority, title, date, time, img_path, onClick }) {
 					<img className='h-10 w-10 rounded-full' src={img_path} alt='' />
 				</div>
 			</div>
+
+			<div className='flex gap-1 ml-2 mt-1'>
+				<p
+					className={`text-sm font-semibold py-1 w-25 text-center backdrop-blur-sm rounded-full mr-2 ${priorityColor}`}
+				>
+					{priority}
+				</p>
+			</div>
 			<div className='flex gap-5 m-2'>
 				<div className='flex items-center gap-1'>
 					<img className='h-4' src='assets/icons/calendar.svg' alt='' />
@@ -32,13 +40,6 @@ function DoneTaskCard({ priority, title, date, time, img_path, onClick }) {
 					<img className='h-4' src='assets/icons/clock.svg' alt='' />
 					<p>{time}</p>
 				</div>
-			</div>
-			<div className='flex gap-1 m-2'>
-				<p
-					className={`text-sm font-semibold py-1 w-25 text-center backdrop-blur-sm rounded-full mr-2 ${priorityColor}`}
-				>
-					{priority}
-				</p>
 			</div>
 		</div>
 	)

@@ -45,7 +45,7 @@ function MainPage() {
 			const data = await res.json()
 			setToMeCount(data.to_me)
 			setFromMeCount(data.from_me)
-			setDoneCount(data.done)
+			setDoneCount(data.done_today)
 		}
 
 		fetchTaskCounts()
@@ -59,7 +59,7 @@ function MainPage() {
 					userData ? userData.image_path : 'https://placehold.co/50x50.png'
 				}
 				onCreateTask={() => setIsModalOpen(true)}
-				done_count={doneCount}
+				done_count={doneCount || 0}
 			/>
 			<TwoTabs
 				activeTab={activeTab}

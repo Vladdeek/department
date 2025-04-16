@@ -1,10 +1,11 @@
 import random
 import ast
 import requests
-from fastapi import FastAPI, HTTPException, Path, Query, Body, Depends
+from datetime import date, datetime, timedelta
+from fastapi import FastAPI, HTTPException, Path, Query, Body, Depends, Request
 from typing import Optional, List, Dict, Annotated
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc,  Date, DateTime, cast
 from passlib.context import CryptContext # библиотека для ХЕША паролей 
 
 #импорт наших классов
@@ -114,6 +115,18 @@ def get_tasks_by_executing_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.get("/task-counts/{user_id}")
 async def get_task_counts(user_id: int, db: Session = Depends(get_db)):
+    today = date.today()
+
+    start = datetime.combine(today, datetime.min.time())
+    end = start + timedelta(days=1)
+
+    done_today_count = db.query(Task).filter(
+        Task.executing == user_id,
+        Task.status_id == 3,
+        Task.date >= start,
+        Task.date < end
+    ).count()
+
     to_me_count = db.query(Task).filter(
         Task.executing == user_id,
         Task.status_id == 1
@@ -124,16 +137,12 @@ async def get_task_counts(user_id: int, db: Session = Depends(get_db)):
         Task.status_id.in_([1, 2])
     ).count()
 
-    done_today_count = db.query(Task).filter(
-        ((Task.executing == user_id) | (Task.sender == user_id)),
-        Task.status_id == 3,
-        Task.date.cast(Date) == today
-    ).count()
+   
 
     return {
         "to_me": to_me_count,
         "from_me": from_me_count,
-        "done": done_count
+        "done_today": done_today_count
     }
 
 
@@ -157,3 +166,20 @@ def get_users_by_department(dep_id: int, db: Session = Depends(get_db)):
 @app.get("/priorities", response_model=List[PrioritySchema])
 def get_priorities(db: Session = Depends(get_db)):
     return db.query(Priority).all()
+
+@app.put("/task/{task_id}/status")
+async def update_task_status(task_id: int, request: Request, db: Session = Depends(get_db)):
+    data = await request.json()
+    status_id = data.get("status_id")
+
+    if status_id is None:
+        raise HTTPException(status_code=400, detail="status_id is required")
+
+    task = db.query(Task).filter(Task.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    task.status_id = status_id
+    db.commit()
+    db.refresh(task)
+    return {"message": "Status updated successfully", "task": task}

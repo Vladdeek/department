@@ -17,7 +17,6 @@ const TaskCreateModal = ({ onClose }) => {
 	})
 	const isFormValid =
 		formData.title &&
-		formData.description &&
 		formData.departmentId &&
 		formData.executing &&
 		formData.priority_id
@@ -64,6 +63,7 @@ const TaskCreateModal = ({ onClose }) => {
 			sender: userId,
 			priority_id: Number(formData.priority_id),
 			date: new Date().toISOString(),
+			status_id: 1,
 		}
 
 		fetch('http://localhost:8000/task', {
@@ -182,25 +182,48 @@ const TaskCreateModal = ({ onClose }) => {
 						</select>
 					</label>
 
-					<label>
-						<span>Приоритет</span>
-						<select
-							value={formData.priority_id}
-							onChange={e =>
-								setFormData({ ...formData, priority_id: e.target.value })
-							}
-							className='w-full p-3 mb-3 rounded-xl bg-[#efefef]'
-						>
-							<option className='text-black' value=''>
-								Выберите приоритет
-							</option>
-							{priorities.map(priority => (
-								<option key={priority.id} value={priority.id}>
-									{priority.priority}
-								</option>
-							))}
-						</select>
-					</label>
+					<div className='w-full'>
+						<label>
+							<span className='block mb-2'>Приоритет выполнения задачи</span>
+							<div className='flex justify-between'>
+								{priorities.map(priority => {
+									let baseColor = ''
+									let grayColor = 'bg-[#E4E4E4] text-[#9B9B9B]'
+
+									switch (priority.priority.toLowerCase()) {
+										case 'низкий':
+											baseColor = 'bg-[#C3FDC1] text-[#0EC305]'
+											break
+										case 'средний':
+											baseColor = 'bg-[#FDF8C1] text-[#C3B505]'
+											break
+										case 'высокий':
+											baseColor = 'bg-[#FF9C9C] text-[#C30505]'
+											break
+										default:
+											baseColor = 'bg-gray-300 text-black'
+									}
+
+									const isSelected = formData.priority_id === priority.id
+
+									return (
+										<button
+											key={priority.id}
+											type='button'
+											className={`font-bold p-3 rounded-xl transition-all ${
+												isSelected ? baseColor : grayColor
+											}`}
+											onClick={() =>
+												setFormData({ ...formData, priority_id: priority.id })
+											}
+										>
+											{priority.priority}
+										</button>
+									)
+								})}
+							</div>
+						</label>
+					</div>
 
 					<button
 						onClick={handleSubmit}

@@ -57,7 +57,8 @@ function ToMe() {
 				{ method: 'GET', headers: { 'Content-Type': 'application/json' } }
 			)
 			const data = await response.json()
-			setTaskData(data)
+			const activeTasks = data.filter(task => task.status_id === 1) // вот тут фильтрация
+			setTaskData(activeTasks)
 			setIsLoading(false)
 		}
 
@@ -111,7 +112,11 @@ function ToMe() {
 			)}
 
 			{selectedTask && (
-				<TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} />
+				<TaskModal
+					task={selectedTask}
+					from='ToMe'
+					onClose={() => setSelectedTask(null)}
+				/>
 			)}
 		</>
 	)

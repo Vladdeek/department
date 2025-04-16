@@ -9,8 +9,8 @@ from passlib.context import CryptContext # библиотека для ХЕША 
 
 #импорт наших классов
 from database import engine, session_local
-from models import Base, Department, Priority, User, Task
-from schemas import UserCreate, User as UserSchema, TaskCreate, Task as TaskSchema, Department as DepartmentSchema, Priority as PrioritySchema
+from models import Base, Department, Priority, User, Task, Status, Cabinet
+from schemas import UserCreate, User as UserSchema, TaskCreate, Task as TaskSchema, Department as DepartmentSchema, Priority as PrioritySchema, StatusCreate, Status as StatusSchema, CabinetCreate, Cabinet as CabinetSchema
 
 
 app = FastAPI()
@@ -84,7 +84,8 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
         priority_id=task.priority_id,
         executing=task.executing,
         sender=task.sender,
-        date=task.date
+        date=task.date,
+        status_id=task.status_id
     )
     db.add(new_task)
     db.commit()
@@ -113,13 +114,40 @@ def get_tasks_by_executing_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.get("/task-counts/{user_id}")
 async def get_task_counts(user_id: int, db: Session = Depends(get_db)):
-    to_me_count = db.query(Task).filter(Task.executing == user_id).count()
-    from_me_count = db.query(Task).filter(Task.sender == user_id).count()
-    return {"to_me": to_me_count, "from_me": from_me_count}
+    to_me_count = db.query(Task).filter(
+        Task.executing == user_id,
+        Task.status_id == 1
+    ).count()
+
+    from_me_count = db.query(Task).filter(
+        Task.sender == user_id,
+        Task.status_id.in_([1, 2])
+    ).count()
+
+    done_today_count = db.query(Task).filter(
+        ((Task.executing == user_id) | (Task.sender == user_id)),
+        Task.status_id == 3,
+        Task.date.cast(Date) == today
+    ).count()
+
+    return {
+        "to_me": to_me_count,
+        "from_me": from_me_count,
+        "done": done_count
+    }
+
 
 @app.get("/departments", response_model=List[DepartmentSchema])
 def get_departments(db: Session = Depends(get_db)):
     return db.query(Department).all()
+
+@app.get("/cabinets", response_model=List[CabinetSchema])
+def get_cabinets(db: Session = Depends(get_db)):
+    return db.query(Cabinet).all()
+
+@app.get("/statuses", response_model=List[StatusSchema])
+def get_statuses(db: Session = Depends(get_db)):
+    return db.query(Status).all()
 
 @app.get("/users-by-department/{dep_id}", response_model=List[UserSchema])
 def get_users_by_department(dep_id: int, db: Session = Depends(get_db)):

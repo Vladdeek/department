@@ -16,6 +16,7 @@ function MainPage() {
 
 	const [toMeCount, setToMeCount] = useState(0)
 	const [fromMeCount, setFromMeCount] = useState(0)
+	const [doneCount, setDoneCount] = useState(0)
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -44,6 +45,7 @@ function MainPage() {
 			const data = await res.json()
 			setToMeCount(data.to_me)
 			setFromMeCount(data.from_me)
+			setDoneCount(data.done)
 		}
 
 		fetchTaskCounts()
@@ -57,6 +59,7 @@ function MainPage() {
 					userData ? userData.image_path : 'https://placehold.co/50x50.png'
 				}
 				onCreateTask={() => setIsModalOpen(true)}
+				done_count={doneCount}
 			/>
 			<TwoTabs
 				activeTab={activeTab}

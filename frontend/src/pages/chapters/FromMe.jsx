@@ -63,7 +63,10 @@ function FromMe() {
 				}
 			)
 			const data = await response.json()
-			setTaskData(data)
+			const filteredTasks = data.filter(
+				task => task.status_id === 1 || task.status_id === 2
+			)
+			setTaskData(filteredTasks)
 			setIsLoading(false)
 		}
 
@@ -113,7 +116,11 @@ function FromMe() {
 			)}
 
 			{selectedTask && (
-				<TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} />
+				<TaskModal
+					task={selectedTask}
+					from='FromMe'
+					onClose={() => setSelectedTask(null)}
+				/>
 			)}
 		</>
 	)

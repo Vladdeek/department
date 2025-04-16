@@ -9,6 +9,21 @@ function TaskCard({
 	username,
 	onClick,
 }) {
+	let priorityColor = ''
+
+	switch (priority?.toLowerCase()) {
+		case 'низкий':
+			priorityColor = 'bg-[#C3FDC1] text-[#0EC305]'
+			break
+		case 'средний':
+			priorityColor = 'bg-[#FDF8C1] text-[#C3B505]'
+			break
+		case 'высокий':
+			priorityColor = 'bg-[#FF9C9C] text-[#C30505]'
+			break
+		default:
+			priorityColor = 'bg-gray-300 text-black'
+	}
 	return (
 		<div
 			className={`w-full flex flex-col justify-between h-50 rounded-4xl bg-white py-3 px-3 shadow-xl active:shadow-lg active:scale-99 transition-all`}
@@ -27,11 +42,7 @@ function TaskCard({
 
 			<div className='flex gap-1 m-2'>
 				<p
-					className={`text-sm font-normal py-1 w-20 text-center backdrop-blur-sm rounded-full mr-2`}
-					style={{
-						backgroundColor: lightTheme.primary,
-						color: lightTheme.background,
-					}}
+					className={`text-sm font-semibold py-1 w-20 text-center backdrop-blur-sm rounded-full mr-2 ${priorityColor}`}
 				>
 					{priority}
 				</p>

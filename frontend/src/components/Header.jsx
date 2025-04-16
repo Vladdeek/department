@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { darkTheme, lightTheme } from '../constants'
 
-function Header({ username, image_path, onCreateTask }) {
+function Header({ username, image_path, onCreateTask, done_count }) {
 	const navigate = useNavigate()
 	const [greeting, setGreeting] = useState('')
 
@@ -33,12 +33,19 @@ function Header({ username, image_path, onCreateTask }) {
 					<img src='assets/icons/plus.svg' alt='' className=' ' />
 					<p className='font-semibold'>Создать задачу</p>
 				</button>
-
-				<img
-					src={image_path}
-					alt=''
-					className=' h-12 w-12 object-cover rounded-2xl'
-				/>
+				<div className='flex gap-3'>
+					<img
+						src='assets/icons/clipboard-check.svg'
+						alt=''
+						className=' h-12 w-12 object-cover rounded-2xl p-2 bg-[#ffffff50] shadow-sm active:bg-[#ffffff75] active:scale-95 active:shadow-xs transition-all'
+						onClick={() => navigate('/done')}
+					/>
+					<img
+						src={image_path}
+						alt=''
+						className=' h-12 w-12 object-cover rounded-2xl'
+					/>
+				</div>
 			</div>
 
 			<div className='flex flex-col gap-3 mt-15'>
@@ -48,7 +55,8 @@ function Header({ username, image_path, onCreateTask }) {
 				</h1>
 				<h2 className='text-5xl font-bold'>{greeting}</h2>
 				<p className='text-lg font-light'>
-					Ты выполнил <span className='font-semibold'>5 задач</span> сегодня
+					Ты выполнил <span className='font-semibold'>{done_count} задач</span>{' '}
+					сегодня
 				</p>
 			</div>
 		</header>

@@ -25,14 +25,34 @@ class Priority(Base):
 
     tasks = relationship("Task", back_populates="priority")
 
+class Status(Base):
+    __tablename__ = 'Status'
+
+    id = Column(Integer, primary_key=True, index=True)
+    status = Column(String, index=True)  
+
+    tasks = relationship("Task", back_populates="status")
+
+class Cabinet(Base):
+    __tablename__ = "Cabinet"
+
+    id = Column(Integer, primary_key=True, index=True)
+    number = Column(String, unique=True, index=True)  
+
+    department = relationship("Department", back_populates="cabinet", uselist=False)  
+
 
 class Department(Base):
     __tablename__ = "Department"
 
     id = Column(Integer, primary_key=True, index=True)
     DepName = Column(String, index=True)
+    cabinet_id = Column(Integer, ForeignKey("Cabinet.id"), nullable=True)  
+
+    cabinet = relationship("Cabinet", back_populates="department", uselist=False)  
 
     users = relationship("User", back_populates="department")
+
 
 
 class Task(Base):
@@ -45,7 +65,9 @@ class Task(Base):
     executing = Column(Integer, ForeignKey('User.user_id'), nullable=False)
     sender = Column(Integer, ForeignKey('User.user_id'), nullable=False)
     date = Column(DateTime, index=True)
-
+    status_id = Column(Integer, ForeignKey('Status.id'), nullable=False)
+    
+    status = relationship("Status", back_populates="tasks")
     executing_user = relationship("User", back_populates="executing_tasks", foreign_keys=[executing])
     sender_user = relationship("User", back_populates="sent_tasks", foreign_keys=[sender])
     priority = relationship("Priority", back_populates="tasks")

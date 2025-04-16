@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './pages/login'
 import Loading from './pages/Loading'
 import MainPage from './pages/MainPage'
+import Done from './pages/Done'
 
 const App = () => {
 	return (
@@ -10,6 +11,7 @@ const App = () => {
 				<Route path='/' element={<Loading />} />
 				<Route path='/login' element={<Login />} />
 				<Route path='/main' element={<MainPage />} />
+				<Route path='/done' element={<Done />} />
 			</Routes>
 		</BrowserRouter>
 	)

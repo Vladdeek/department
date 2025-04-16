@@ -130,7 +130,7 @@ function Done() {
 						</motion.div>
 					))
 				) : (
-					<p className='text-center text-gray-500 text-lg mt-4'>Задач нет 💤</p>
+					<p className='text-center text-gray-500 text-lg mt-4'></p>
 				)}
 
 				{selectedTask && (

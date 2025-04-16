@@ -120,7 +120,12 @@ function ToMe() {
 					</motion.div>
 				))
 			) : (
-				<p className='text-center text-gray-500 text-lg mt-4'>Задач нет 💤</p>
+				<div className='w-full flex justify-center'>
+					<div className='flex items-center gap-3'>
+						<p className=' text-gray-500 text-lg'>Задач нет</p>
+						<img src='assets/1f4a4.webp' alt='' className='h-4' />
+					</div>
+				</div>
 			)}
 
 			{selectedTask && (
